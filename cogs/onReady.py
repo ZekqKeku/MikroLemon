@@ -3,7 +3,7 @@ import nextcord
 from nextcord.ext import commands
 from utilities.logger import log
 
-class OnreadyCog(commands.Cog):
+class OnReadyCog(commands.Cog):
     def __init__(self, client):
         self.client = client
 
