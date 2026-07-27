@@ -20,18 +20,18 @@ class ConnectedDevicesCog(commands.Cog):
             return False
         return True
 
-    def get_api(self):
-        connection = routeros_api.RouterOsApiPool(
+    def get_pool(self):
+        return routeros_api.RouterOsApiPool(
             self.host, 
             username=self.user, 
             password=self.password,
             plaintext_login=True
         )
-        return connection.get_api()
 
     def _fetch_networks(self):
         try:
-            api = self.get_api()
+            pool = self.get_pool()
+            api = pool.get_api()
             addresses = api.get_resource('/ip/address').get()
             networks = []
             for addr in addresses:
@@ -39,9 +39,11 @@ class ConnectedDevicesCog(commands.Cog):
                     networks.append(addr['network'])
                 if 'address' in addr:
                     networks.append(addr['address'].split('/')[0])
-            api.get_connection().disconnect()
+            pool.disconnect()
             return list(set(networks))
-        except Exception:
+        except Exception as e:
+            from utilities.logger import log
+            log.error(f"Error fetching networks: {e}")
             return []
 
     @nextcord.slash_command(name="connected", description="Wyświetla wszystkie połączone urządzenia w danej sieci")
@@ -49,9 +51,10 @@ class ConnectedDevicesCog(commands.Cog):
         await interaction.response.defer(ephemeral=False)
         
         try:
-            api = self.get_api()
+            pool = self.get_pool()
+            api = pool.get_api()
             leases = api.get_resource('/ip/dhcp-server/lease').get()
-            api.get_connection().disconnect()
+            pool.disconnect()
             
             connected_devices = []
             search_prefix = network.rsplit('.', 1)[0] if '.' in network else network
