@@ -1,6 +1,7 @@
 import os
 import nextcord
 from nextcord.ext import commands
+from utilities.logger import log
 
 class EventCog(commands.Cog):
     def __init__(self, client, database):
@@ -10,7 +11,7 @@ class EventCog(commands.Cog):
 
     @commands.Cog.listener()
     async def on_ready(self):
-        print(f"Zalogowano jako {self.client.user}")
+        log.info(f"Zalogowano jako {self.client.user}")
         
         if self.db.get_users_count() == 0 and self.initial_admin_id:
             try:
@@ -19,6 +20,6 @@ class EventCog(commands.Cog):
                 user = await self.client.fetch_user(admin_id_int)
                 if user:
                     await user.send("Zostałeś ustawiony jako główny administrator bota MikroLemon. Twoje konto zostało dodane do bazy danych. Możesz teraz używać komend bota, a także dodawać innych użytkowników!")
-                    print(f"Wysłano powitalną wiadomość do administratora: {user.name}")
+                    log.info(f"Wysłano powitalną wiadomość do administratora: {user.name}")
             except Exception as e:
-                print(f"Błąd podczas inicjalizacji pierwszego admina: {e}")
+                log.error(f"Błąd podczas inicjalizacji pierwszego admina: {e}")

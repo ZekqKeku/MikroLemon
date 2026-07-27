@@ -1,6 +1,7 @@
 import os
 import importlib
 import inspect
+from utilities.logger import log
 
 class Loader:
     def __init__(self, payload: dict[str, any], folder="cogs"):
@@ -10,7 +11,7 @@ class Loader:
         self.folder = folder
 
         if not os.path.exists(self.folder):
-            print(f"Warning: Folder {self.folder} not found.")
+            log.warning(f"Folder {self.folder} not found.")
             return
 
         for filename in os.listdir(self.folder):
@@ -33,7 +34,7 @@ class Loader:
                         class_name = standard_class_name
                         cog_class = getattr(module, standard_class_name)
                     else:
-                        print(f"\n > Failed to load: {module_name}: Class not found.\n")
+                        log.error(f"Failed to load: {module_name}: Class not found.")
                         continue
 
                     sig = inspect.signature(cog_class.__init__)
@@ -44,11 +45,11 @@ class Loader:
                         if p in self.payload:
                             args.append(self.payload[p])
                         else:
-                            print(f"Warning: Parameter '{p}' not found in payload for {class_name}")
+                            log.warning(f"Parameter '{p}' not found in payload for {class_name}")
 
                     cog_instance = cog_class(*args)
                     self.client.add_cog(cog_instance)
-                    print(f"Loaded: {class_name}")
+                    log.info(f"Loaded: {class_name}")
 
                 except Exception as e:
-                    print(f"\n > Failed to load {module_name} ({class_name}): {e}\n")
+                    log.error(f"Failed to load {module_name} ({class_name}): {e}")

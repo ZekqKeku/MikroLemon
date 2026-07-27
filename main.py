@@ -15,7 +15,7 @@ def main():
         raise ValueError("BOT_TOKEN is missing in .env file.")
 
     data_dir = '/data' if os.path.exists('/.dockerenv') else './data'
-    db = database.Database(data_dir, 'mikrolemon.db')
+    db = database.Database(data_dir, 'data.db')
 
     intents = nextcord.Intents.default()
     intents.message_content = True
