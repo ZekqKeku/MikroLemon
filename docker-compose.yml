@@ -10,3 +10,4 @@ services:
     volumes:
       - ./data:/data
       - ./logs:/logs
+      - ./invite.txt:/app/invite.txt

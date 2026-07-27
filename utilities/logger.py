@@ -22,7 +22,7 @@ def setup_logger(name="mikrolemon", log_dir="/logs"):
         console_handler.setFormatter(log_format)
         logger.addHandler(console_handler)
 
-        log_file = os.path.join(log_dir, 'mikrolemon.txt')
+        log_file = os.path.join(log_dir, 'log.txt')
         file_handler = TimedRotatingFileHandler(
             log_file,
             when="midnight",

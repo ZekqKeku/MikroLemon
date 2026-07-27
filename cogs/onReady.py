@@ -17,7 +17,6 @@ class OnreadyCog(commands.Cog):
         invite_link = f"https://discordapp.com/api/oauth2/authorize?client_id={self.client.user.id}&permissions=8&scope=bot"
         log.info(f"Link do zaproszenia: {invite_link}")
         
-        data_dir = '/data' if os.path.exists('/.dockerenv') else './data'
-        os.makedirs(data_dir, exist_ok=True)
-        with open(os.path.join(data_dir, 'invite.txt'), 'w', encoding='utf-8') as f:
+        # Save invite.txt in the root directory
+        with open('invite.txt', 'w', encoding='utf-8') as f:
             f.write(invite_link)
