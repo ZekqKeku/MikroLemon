@@ -11,8 +11,6 @@ class EventCog(commands.Cog):
 
     @commands.Cog.listener()
     async def on_ready(self):
-        log.info(f"Zalogowano jako {self.client.user}")
-        
         if self.db.get_users_count() == 0 and self.initial_admin_id:
             try:
                 admin_id_int = int(self.initial_admin_id)
