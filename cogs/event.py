@@ -18,7 +18,7 @@ class EventCog(commands.Cog):
                 self.db.add_user(admin_id_int)
                 user = await self.client.fetch_user(admin_id_int)
                 if user:
-                    await user.send("Hej! Zostałeś ustawiony jako główny administrator bota MikroLemon. Twoje konto zostało dodane do bazy danych. Możesz teraz używać komend bota, a także dodawać innych użytkowników!")
+                    await user.send("Zostałeś ustawiony jako główny administrator bota MikroLemon. Twoje konto zostało dodane do bazy danych. Możesz teraz używać komend bota, a także dodawać innych użytkowników!")
                     print(f"Wysłano powitalną wiadomość do administratora: {user.name}")
             except Exception as e:
                 print(f"Błąd podczas inicjalizacji pierwszego admina: {e}")

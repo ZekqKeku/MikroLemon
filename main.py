@@ -32,7 +32,6 @@ def main():
     }
 
     baseUtils.Loader(payload)
-
     client.run(bot_token)
 
 if __name__ == "__main__":

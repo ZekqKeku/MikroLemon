@@ -1,0 +1,13 @@
+name: DeployBot
+on:
+  push:
+    branches:
+      - main
+jobs:
+  deploy:
+    runs-on: self-hosted
+    steps:
+      - name: CheckoutCode
+        uses: actions/checkout@v4
+      - name: StartContainer
+        run: sudo docker compose up --build -d
