@@ -51,14 +51,20 @@ class ConnectedDevicesCog(commands.Cog):
             pool = self.get_pool()
             api = pool.get_api()
             addresses = api.get_resource('/ip/address').get()
-            networks = []
+            networks = set()
+            
             for addr in addresses:
+                # Prefer 'network' (e.g. 192.168.75.0), fallback to deriving it from 'address'
                 if 'network' in addr:
-                    networks.append(addr['network'])
-                if 'address' in addr:
-                    networks.append(addr['address'].split('/')[0])
+                    networks.add(addr['network'])
+                elif 'address' in addr:
+                    ip = addr['address'].split('/')[0]
+                    if '.' in ip:
+                        prefix = ip.rsplit('.', 1)[0]
+                        networks.add(f"{prefix}.0")
+                        
             pool.disconnect()
-            return list(set(networks))
+            return sorted(list(networks))
         except Exception as e:
             from utilities.logger import log
             log.error(f"Error fetching networks: {e}")
