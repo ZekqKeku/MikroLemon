@@ -9,5 +9,7 @@ jobs:
     steps:
       - name: CheckoutCode
         uses: actions/checkout@v4
+        with:
+          clean: false
       - name: StartContainer
         run: sudo docker compose up --build -d
