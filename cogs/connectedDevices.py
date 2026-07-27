@@ -1,8 +1,9 @@
 import nextcord
-from nextcord.ext import commands
+from nextcord.ext import commands, tasks
 import os
 import routeros_api
 import time
+import asyncio
 
 class ConnectedDevicesCog(commands.Cog):
     def __init__(self, client, database):
@@ -12,7 +13,24 @@ class ConnectedDevicesCog(commands.Cog):
         self.user = os.getenv('MIKROTIK_USER')
         self.password = os.getenv('MIKROTIK_PASS')
         self._networks_cache = []
-        self._networks_last_fetch = 0
+        self.fetch_networks_loop.start()
+
+    def cog_unload(self):
+        self.fetch_networks_loop.cancel()
+
+    @tasks.loop(minutes=5)
+    async def fetch_networks_loop(self):
+        try:
+            fetched = await asyncio.to_thread(self._fetch_networks)
+            if fetched:
+                self._networks_cache = fetched
+        except Exception as e:
+            from utilities.logger import log
+            log.error(f"Background network fetch failed: {e}")
+
+    @fetch_networks_loop.before_loop
+    async def before_fetch_networks(self):
+        await self.client.wait_until_ready()
 
     async def cog_application_command_check(self, interaction: nextcord.Interaction):
         if not self.db.is_authorized(interaction.user.id):
@@ -88,16 +106,9 @@ class ConnectedDevicesCog(commands.Cog):
 
     @connected.on_autocomplete("network")
     async def connected_autocomplete(self, interaction: nextcord.Interaction, current: str):
-        now = time.time()
-        if now - self._networks_last_fetch > 60:
-            fetched = self._fetch_networks()
-            if fetched:
-                self._networks_cache = fetched
-                self._networks_last_fetch = now
-                
         choices = [net for net in self._networks_cache if current.lower() in net.lower()][:25]
         
         if not choices and not self._networks_cache:
-            choices = ["Wpisz adres sieci..."]
+            choices = ["Ładowanie sieci z routera..."]
             
         await interaction.response.send_autocomplete(choices)
